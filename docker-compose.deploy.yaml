@@ -1,0 +1,33 @@
+version: '3'
+services:
+  api:
+    image: node:latest
+    working_dir: /code
+    volumes:
+      - type: bind
+        source: ./api
+        target: /code
+    container_name: habit_tracker_dev_api
+    ports:
+      - 3000:3000
+    environment:
+      - DB_NAME=habits
+      - DB_CONNECTION=mongodb://AATTWM:habitspass@db:27017
+    depends_on:
+      - db
+    command: bash -c "npm install && npm run dev"
+
+  db:
+    container_name: habit_tracker_dev_db
+    image: mongo:latest
+    volumes:
+      - "./db/seeds.js:/docker-entrypoint-initdb.d/seeds.js:ro"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=AATTWM
+      - MONGO_INITDB_ROOT_PASSWORD=habitspass
+      - MONGO_INITDB_DATABASE=habits
+volumes:
+  dbdata:
+networks:
+  default:
+    name: habit_tracker_api
