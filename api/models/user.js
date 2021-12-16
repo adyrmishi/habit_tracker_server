@@ -68,7 +68,7 @@ module.exports = class User {
                 const db = await initDB();
                 const clearedUser = await db.collection('users').updateOne(
                     { userEmail: email },
-                    { $pull: { refreshTokens: { $eq: token } } }
+                    { $pull: { refreshTokens: token } }
                 );
                 res(clearedUser);
             } catch (err) {
