@@ -29,7 +29,7 @@ module.exports = class User {
                 let user = new User(result[0]);
                 res(user);
             } catch (err) {
-                rej('Error finding user by email');
+                rej(`Error finding user by email: ${err}`);
             }
         })
     }
@@ -45,14 +45,14 @@ module.exports = class User {
 
                 const db = await initDB();
                 // find and update ONLY if being inserted
-                const result = db.collection('users').findOneAndUpdate(
+                const result = await db.collection('users').findOneAndUpdate(
                     { userEmail: userEmail },
                     { $setOnInsert: { userEmail: userEmail, passwordDigest: passwordDigest, userName: userName, refreshTokens:refreshTokens } },
-                    { upsert: true, returnDocument: false }
+                    { upsert: true, returnDocument: "after" }
                 );
                 // check if user already exists
                 if (result.lastErrorObject.updatedExisting === true) {
-                    reject('Error: User already exists');
+                    rej('Error: User already exists');
                 }
 
                 res(result.value);
@@ -72,7 +72,7 @@ module.exports = class User {
                 );
                 res(clearedUser);
             } catch (err) {
-                rej(`Error clearing access token for user ${email}`)
+                rej(`Error clearing access token for user ${email}: ${err}`)
             }
         })
     }
@@ -87,7 +87,7 @@ module.exports = class User {
                 );
                 res(result);
             } catch (err) {
-                rej(`Error pushing access token for user ${email}`)
+                rej(`Error pushing access token for user ${email}: ${err}`);
             }
         })
     }
